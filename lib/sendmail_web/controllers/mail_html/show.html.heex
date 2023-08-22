@@ -1,0 +1,16 @@
+<.header>
+  Mail <%= @mail.id %>
+  <:subtitle>This is a mail record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/mails/#{@mail}/edit"}>
+      <.button>Edit mail</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Subject"><%= @mail.subject %></:item>
+  <:item title="Body"><%= @mail.body %></:item>
+</.list>
+
+<.back navigate={~p"/mails"}>Back to mails</.back>

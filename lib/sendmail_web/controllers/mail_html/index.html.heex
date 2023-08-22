@@ -1,0 +1,24 @@
+<.header>
+  Listing Mails
+  <:actions>
+    <.link href={~p"/mails/new"}>
+      <.button>New Mail</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="mails" rows={@mails} row_click={&JS.navigate(~p"/mails/#{&1}")}>
+  <:col :let={mail} label="Subject"><%= mail.subject %></:col>
+  <:col :let={mail} label="Body"><%= mail.body %></:col>
+  <:action :let={mail}>
+    <div class="sr-only">
+      <.link navigate={~p"/mails/#{mail}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/mails/#{mail}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={mail}>
+    <.link href={~p"/mails/#{mail}"} method="delete" data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
