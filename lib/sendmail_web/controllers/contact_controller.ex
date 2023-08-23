@@ -15,6 +15,8 @@ defmodule SendmailWeb.ContactController do
   end
 
   def create(conn, %{"contact" => contact_params}) do
+    contact_params = Map.put(contact_params, "user_id", conn.assigns.current_user.id)
+
     case Contacts.create_contact(contact_params) do
       {:ok, contact} ->
         conn

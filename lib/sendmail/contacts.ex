@@ -18,8 +18,12 @@ defmodule Sendmail.Contacts do
 
   """
   def list_contacts(user) do
-    from(c in Contact, where: c.user_id == ^user.id)
-    |> Repo.all()
+    if user.role == "admin" do
+      Repo.all(Contact)
+    else
+      from(c in Contact, where: c.user_id == ^user.id)
+      |> Repo.all()
+    end
   end
 
   @doc """

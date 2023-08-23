@@ -21,11 +21,16 @@ defmodule SendmailWeb.MailController do
     contact =
       if contact_email != nil do
         Contacts.get_contact_by_email(mail_params["contact_email"]) ||
-          Contacts.create_contact(%{"email" => mail_params["contact_email"]})
+          case Contacts.create_contact(%{"email" => mail_params["contact_email"]}) do
+            {:ok, contact} -> contact
+            {:error, _changeset} -> nil
+          end
       end
 
     if contact do
+      # Associate the mail with the current user and contact
       mail_params = Map.put(mail_params, "contact_id", contact.id)
+      mail_params = Map.put(mail_params, "user_id", conn.assigns.current_user.id)
 
       case Mails.create_mail(mail_params) do
         {:ok, mail} ->
@@ -37,9 +42,9 @@ defmodule SendmailWeb.MailController do
           render(conn, :new, changeset: changeset)
       end
     else
-      # Handle the case where no contact email was provided
+      # Handle the case where no contact email was provided or contact creation failed
       conn
-      |> put_flash(:error, "No contact with that email was found.")
+      |> put_flash(:error, "No contact with that email was found or could not be created.")
       |> render(:new, changeset: Mails.change_mail(%Mail{}))
     end
   end

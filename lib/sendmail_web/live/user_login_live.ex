@@ -40,4 +40,20 @@ defmodule SendmailWeb.UserLoginLive do
     form = to_form(%{"email" => email}, as: "user")
     {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
   end
+
+  def handle_event("authenticate", %{"user" => user_params}, socket) do
+    case Sendmail.Accounts.authenticate_user(user_params) do
+      {:ok, user} ->
+        case user.role do
+          "admin" ->
+            # direct them to "/users
+            {:noreply, redirect(socket, to: "/admin/users")}
+
+          _ ->
+            {:noreply, redirect(socket, to: "/mails")}
+        end
+
+        {:noreply, put_flash(socket, :error, "Failed to login.")}
+    end
+  end
 end

@@ -26,6 +26,30 @@ defmodule Sendmail.Accounts do
     Repo.get_by(User, email: email)
   end
 
+  # change user
+  def change_user(%User{} = user, attrs \\ %{}) do
+    User.changeset(user, attrs)
+  end
+
+  # make admin
+  def make_admin(%User{} = user) do
+    user
+    |> change_user(%{role: "admin"})
+    |> Repo.update()
+  end
+
+  # revoke admin
+  def revoke_admin(%User{} = user) do
+    user
+    |> change_user(%{role: "user"})
+    |> Repo.update()
+  end
+
+  # fetch all users
+  def list_users() do
+    Repo.all(User)
+  end
+
   @doc """
   Gets a user by email and password.
 
@@ -42,6 +66,11 @@ defmodule Sendmail.Accounts do
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
     if User.valid_password?(user, password), do: user
+  end
+
+  # admin to have a list of all users
+  def list_users(%User{role: "admin"}) do
+    Repo.all(User)
   end
 
   @doc """

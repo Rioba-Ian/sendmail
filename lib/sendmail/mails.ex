@@ -18,8 +18,14 @@ defmodule Sendmail.Mails do
 
   """
   def list_mails(user) do
-    from(m in Mail, where: m.user_id == ^user.id)
-    |> Repo.all()
+    IO.inspect(user)
+
+    if user.role == "admin" do
+      Repo.all(Mail)
+    else
+      from(m in Mail, where: m.user_id == ^user.id)
+      |> Repo.all()
+    end
   end
 
   @doc """

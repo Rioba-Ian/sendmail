@@ -13,6 +13,17 @@ defmodule SendmailWeb.UserAuth do
   @remember_me_cookie "_sendmail_web_user_remember_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
+  # plug for admin
+
+  defp init(opts), do: opts
+
+  def ensure_admin_user(conn, _opts) do
+    case conn.assigns.current_user do
+      %{role: "admin"} -> conn
+      _ -> conn |> send_resp(403, "Forbidden") |> halt()
+    end
+  end
+
   @doc """
   Logs the user in.
 

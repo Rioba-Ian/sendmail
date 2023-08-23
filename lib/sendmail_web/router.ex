@@ -1,4 +1,6 @@
 defmodule SendmailWeb.Router do
+  alias SendmailWeb.AdminUserLive
+  alias SendmailWeb.AdminController
   use SendmailWeb, :router
 
   import SendmailWeb.UserAuth
@@ -17,12 +19,27 @@ defmodule SendmailWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :admin do
+    plug :ensure_admin_user
+  end
+
   scope "/", SendmailWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/", PageController, :home
     resources "/contacts", ContactController
     resources "/mails", MailController
+  end
+
+  scope "/admin", SendmailWeb do
+    pipe_through [:browser, :require_authenticated_user, :admin]
+
+    resources "/contacts", ContactController
+    resources "/mails", MailController
+
+    resources "/users", AdminController
+    post "/users/:id/make_admin", AdminController, :make_admin
+    post "/users/:id/revoke_admin", AdminController, :revoke_admin
   end
 
   # Other scopes may use custom stacks.

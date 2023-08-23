@@ -4,6 +4,7 @@ defmodule Sendmail.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :role, :string, default: "user"
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
@@ -14,32 +15,16 @@ defmodule Sendmail.Accounts.User do
     timestamps()
   end
 
-  @doc """
-  A user changeset for registration.
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :role])
+    |> validate_required([:email])
+    |> unique_constraint(:email)
+  end
 
-  It is important to validate the length of both email and password.
-  Otherwise databases may truncate the email without warnings, which
-  could lead to unpredictable or insecure behaviour. Long passwords may
-  also be very expensive to hash for certain algorithms.
-
-  ## Options
-
-    * `:hash_password` - Hashes the password so it can be stored securely
-      in the database and ensures the password field is cleared to prevent
-      leaks in the logs. If password hashing is not needed and clearing the
-      password field is not desired (like when using this changeset for
-      validations on a LiveView form), this option can be set to `false`.
-      Defaults to `true`.
-
-    * `:validate_email` - Validates the uniqueness of the email, in case
-      you don't want to validate the uniqueness of the email (like when
-      using this changeset for validations on a LiveView form before
-      submitting the form), this option can be set to `false`.
-      Defaults to `true`.
-  """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :first_name, :last_name, :msisdn])
+    |> cast(attrs, [:email, :password, :first_name, :last_name, :msisdn, :role])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_required([:first_name, :last_name, :msisdn])
@@ -106,28 +91,6 @@ defmodule Sendmail.Accounts.User do
     end
   end
 
-  @doc """
-  A user changeset for changing the password.
-
-  ## Options
-
-    * `:hash_password` - Hashes the password so it can be stored securely
-      in the database and ensures the password field is cleared to prevent
-      leaks in the logs. If password hashing is not needed and clearing the
-      password field is not desired (like when using this changeset for
-      validations on a LiveView form), this option can be set to `false`.
-      Defaults to `true`.
-  """
-  def password_changeset(user, attrs, opts \\ []) do
-    user
-    |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
-    |> validate_password(opts)
-  end
-
-  @doc """
-  Confirms the account by setting `confirmed_at`.
-  """
   def confirm_changeset(user) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     change(user, confirmed_at: now)
