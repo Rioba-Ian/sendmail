@@ -17,8 +17,9 @@ defmodule Sendmail.Contacts do
       [%Contact{}, ...]
 
   """
-  def list_contacts do
-    Repo.all(Contact)
+  def list_contacts(user) do
+    from(c in Contact, where: c.user_id == ^user.id)
+    |> Repo.all()
   end
 
   @doc """

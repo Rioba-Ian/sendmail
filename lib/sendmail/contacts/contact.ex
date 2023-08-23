@@ -5,6 +5,7 @@ defmodule Sendmail.Contacts.Contact do
   schema "contacts" do
     field :name, :string
     field :email, :string
+    belongs_to :user, Sendmail.Accounts.User
 
     has_many :emails, Sendmail.Mails.Mail
     timestamps()
@@ -13,7 +14,7 @@ defmodule Sendmail.Contacts.Contact do
   @doc false
   def changeset(contact, attrs) do
     contact
-    |> cast(attrs, [:name, :email])
+    |> cast(attrs, [:name, :email, :user_id])
     |> validate_required([:name, :email])
     |> validate_format(:email, ~r/@/)
   end

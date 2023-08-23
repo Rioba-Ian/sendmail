@@ -17,8 +17,9 @@ defmodule Sendmail.Mails do
       [%Mail{}, ...]
 
   """
-  def list_mails do
-    Repo.all(Mail)
+  def list_mails(user) do
+    from(m in Mail, where: m.user_id == ^user.id)
+    |> Repo.all()
   end
 
   @doc """

@@ -6,7 +6,7 @@ defmodule SendmailWeb.MailController do
   alias Sendmail.Contacts
 
   def index(conn, _params) do
-    mails = Mails.list_mails()
+    mails = Mails.list_mails(conn.assigns.current_user)
     render(conn, :index, mails: mails)
   end
 
